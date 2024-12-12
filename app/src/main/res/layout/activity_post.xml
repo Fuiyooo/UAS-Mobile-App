@@ -6,7 +6,18 @@
     android:background="@android:color/black"
     android:padding="16dp">
 
-    <!-- EditText untuk menulis deskripsi postingan -->
+    <EditText
+        android:id="@+id/etTitle"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:hint="Enter title..."
+        android:inputType="text"
+        android:textSize="16sp"
+        android:layout_marginBottom="16dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
     <EditText
         android:id="@+id/etDescription"
         android:layout_width="0dp"
@@ -15,48 +26,42 @@
         android:inputType="textMultiLine"
         android:minLines="4"
         android:gravity="top|start"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/etTitle"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginBottom="16dp" />
 
-    <!-- ImageView untuk menampilkan gambar yang diupload -->
-    <ImageView
-        android:id="@+id/ivPostImage"
-        android:layout_width="200dp"
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvImages"
+        android:layout_width="0dp"
         android:layout_height="200dp"
-        android:scaleType="centerCrop"
-        android:src="@drawable/ic_image_placeholder"
+        android:layout_marginBottom="16dp"
         app:layout_constraintTop_toBottomOf="@+id/etDescription"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginBottom="16dp" />
+        app:layout_constraintEnd_toEndOf="parent" />
 
-    <!-- Button untuk memilih gambar dari galeri -->
     <Button
         android:id="@+id/btnChooseImage"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:text="Choose Image"
-        app:layout_constraintTop_toBottomOf="@+id/ivPostImage"
+        app:layout_constraintTop_toBottomOf="@+id/rvImages"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/btnTakePhoto"
         android:layout_marginEnd="8dp"
         android:layout_marginBottom="16dp" />
 
-    <!-- Button untuk mengambil gambar dari kamera -->
     <Button
         android:id="@+id/btnTakePhoto"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:text="Take Photo"
-        app:layout_constraintTop_toBottomOf="@+id/ivPostImage"
+        app:layout_constraintTop_toBottomOf="@+id/rvImages"
         app:layout_constraintStart_toEndOf="@+id/btnChooseImage"
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginStart="8dp"
         android:layout_marginBottom="16dp" />
 
-    <!-- Button untuk memposting -->
     <Button
         android:id="@+id/btnPost"
         android:layout_width="wrap_content"
@@ -67,7 +72,6 @@
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginBottom="16dp" />
 
-    <!-- Button untuk kembali ke halaman Home -->
     <Button
         android:id="@+id/btnBackToHome"
         android:layout_width="wrap_content"

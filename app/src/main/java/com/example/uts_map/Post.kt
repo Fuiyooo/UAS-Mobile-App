@@ -1,7 +1,6 @@
-package com.example.uts_map
-
 data class Post(
+    val title: String = "",
     val description: String = "",
-    val imageUrl: String? = null, // URL gambar
+    val imageUrls: List<String> = emptyList(), // Tambahkan properti ini
     val timestamp: Long = 0
 )

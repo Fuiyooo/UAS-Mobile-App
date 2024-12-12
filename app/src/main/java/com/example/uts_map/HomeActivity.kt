@@ -1,5 +1,7 @@
 package com.example.uts_map
 
+import Post
+import com.example.uts_map.TitleAdapter
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
@@ -11,8 +13,8 @@ import com.google.firebase.firestore.FirebaseFirestore
 
 class HomeActivity : AppCompatActivity() {
 
-    private lateinit var rvPosts: RecyclerView
-    private lateinit var postAdapter: PostAdapter
+    private lateinit var rvTitles: RecyclerView
+    private lateinit var titleAdapter: TitleAdapter
     private lateinit var firestore: FirebaseFirestore
     private var postList = mutableListOf<Post>()
 
@@ -24,14 +26,21 @@ class HomeActivity : AppCompatActivity() {
         firestore = FirebaseFirestore.getInstance()
 
         // Inisialisasi RecyclerView
-        rvPosts = findViewById(R.id.rvPosts)
-        rvPosts.layoutManager = LinearLayoutManager(this)
-        postAdapter = PostAdapter(postList)
-        rvPosts.adapter = postAdapter
+        rvTitles = findViewById(R.id.rvTitles) // Mengganti id RecyclerView ke rvTitles
+        rvTitles.layoutManager = LinearLayoutManager(this)
 
+        // Inisialisasi Adapter dengan onItemClick
+        titleAdapter = TitleAdapter(postList) { post ->
+            // Aksi saat judul diklik
+            val intent = Intent(this, PostDetailActivity::class.java)
+            intent.putExtra("description", post.description)
+            intent.putStringArrayListExtra("imageUrls", ArrayList(post.imageUrls))
+            startActivity(intent)
+        }
+        rvTitles.adapter = titleAdapter
 
         // Ambil data postingan dari Firestore
-        loadPostsFromFirestore()
+        loadTitlesFromFirestore()
 
         // Inisialisasi Bottom Navigation
         val bottomNavigation: BottomNavigationView = findViewById(R.id.bottom_navigation)
@@ -40,16 +49,13 @@ class HomeActivity : AppCompatActivity() {
         bottomNavigation.setOnItemSelectedListener { item ->
             when (item.itemId) {
                 R.id.nav_home -> {
-                    // Home dipilih, tetap di halaman ini
                     true
                 }
                 R.id.nav_post -> {
-                    // Buka PostActivity
                     startActivity(Intent(this, PostActivity::class.java))
                     true
                 }
                 R.id.nav_profile -> {
-                    // Buka ProfileActivity
                     startActivity(Intent(this, ProfileActivity::class.java))
                     true
                 }
@@ -57,33 +63,35 @@ class HomeActivity : AppCompatActivity() {
             }
         }
 
-        // Set home sebagai default item yang dipilih
         bottomNavigation.selectedItemId = R.id.nav_home
     }
 
-    // Fungsi untuk mengambil data postingan dari Firestore
-    private fun loadPostsFromFirestore() {
+    private fun loadTitlesFromFirestore() {
         firestore.collection("posts")
             .orderBy("timestamp", com.google.firebase.firestore.Query.Direction.DESCENDING)
             .get()
             .addOnSuccessListener { documents ->
                 if (!documents.isEmpty) {
-                    postList.clear() // Kosongkan list sebelum menambah data baru
+                    postList.clear()
                     for (document in documents) {
-                        val post = document.toObject(Post::class.java)
-                        postList.add(post)
-                        // Tambahkan log untuk memastikan data diambil
-                        println("Post: ${post.description}, Image URL: ${post.imageUrl}")
+                        try {
+                            val post = Post(
+                                title = document.getString("title") ?: "Untitled",
+                                description = document.getString("description") ?: "",
+                                imageUrls = document["imageUrls"] as? List<String> ?: emptyList()
+                            )
+                            postList.add(post)
+                        } catch (e: Exception) {
+                            Toast.makeText(this, "Error parsing post: ${e.message}", Toast.LENGTH_SHORT).show()
+                        }
                     }
-                    postAdapter.notifyDataSetChanged() // Refresh RecyclerView
+                    titleAdapter.notifyDataSetChanged()
                 } else {
-                    Toast.makeText(this, "No posts found", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, "No titles found", Toast.LENGTH_SHORT).show()
                 }
             }
             .addOnFailureListener {
-                Toast.makeText(this, "Failed to load posts: ${it.message}", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Failed to load titles: ${it.message}", Toast.LENGTH_SHORT).show()
             }
     }
-
-
 }

@@ -1,43 +1,34 @@
-package com.example.uts_map
-
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import com.squareup.picasso.Picasso
+import com.example.uts_map.R
 
-class PostAdapter(private val posts: List<Post>) : RecyclerView.Adapter<PostAdapter.PostViewHolder>() {
-
-    class PostViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val tvDescription: TextView = itemView.findViewById(R.id.tvDescription)
-        val ivPostImage: ImageView = itemView.findViewById(R.id.ivPostImage)
-    }
+class PostAdapter(
+    private val posts: List<Post>,
+    private val onItemClick: (Post) -> Unit
+) : RecyclerView.Adapter<PostAdapter.PostViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PostViewHolder {
-        val view = LayoutInflater.from(parent.context).inflate(R.layout.item_post, parent, false)
+        val view = LayoutInflater.from(parent.context)
+            .inflate(R.layout.item_post, parent, false)
         return PostViewHolder(view)
     }
 
     override fun onBindViewHolder(holder: PostViewHolder, position: Int) {
         val post = posts[position]
+        holder.bind(post)
+        holder.itemView.setOnClickListener { onItemClick(post) }
+    }
 
-        // Menampilkan deskripsi
-        holder.tvDescription.text = post.description
+    override fun getItemCount(): Int = posts.size
 
-        // Jika ada gambar, tampilkan gambar menggunakan Picasso
-        if (post.imageUrl != null) {
-            holder.ivPostImage.visibility = View.VISIBLE
-            Picasso.get().load(post.imageUrl).into(holder.ivPostImage)
-        } else {
-            holder.ivPostImage.visibility = View.GONE
+    class PostViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        private val title: TextView = itemView.findViewById(R.id.tvTitle)
+
+        fun bind(post: Post) {
+            title.text = post.title
         }
     }
-
-    override fun getItemCount(): Int {
-        return posts.size
-
-    }
-
 }
