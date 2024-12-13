@@ -3,6 +3,7 @@ package com.example.uts_map
 import ImageAdapter
 import android.app.Activity
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
@@ -10,12 +11,12 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
-import com.squareup.picasso.Picasso
 import java.io.File
 
 class PostActivity : AppCompatActivity() {
@@ -69,14 +70,10 @@ class PostActivity : AppCompatActivity() {
 
         // Tombol untuk mengambil foto dari kamera
         btnTakePhoto.setOnClickListener {
-            val takePictureIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
-            if (takePictureIntent.resolveActivity(packageManager) != null) {
-                val photoFile = File.createTempFile("photo_", ".jpg", cacheDir)
-                photoUri = FileProvider.getUriForFile(this, "${packageName}.provider", photoFile)
-                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoUri)
-                startActivityForResult(takePictureIntent, TAKE_PHOTO_REQUEST)
+            if (checkPermissions()) {
+                openCamera()
             } else {
-                Toast.makeText(this, "Camera not available", Toast.LENGTH_SHORT).show()
+                requestPermissions()
             }
         }
 
@@ -172,5 +169,59 @@ class PostActivity : AppCompatActivity() {
             .addOnFailureListener {
                 Toast.makeText(this, "Failed to upload post: ${it.message}", Toast.LENGTH_SHORT).show()
             }
+    }
+
+    private fun openCamera() {
+        try {
+            val takePictureIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+            if (takePictureIntent.resolveActivity(packageManager) != null) {
+                val photoFile = createImageFile()
+                if (photoFile != null) {
+                    photoUri = FileProvider.getUriForFile(
+                        this,
+                        "${packageName}.provider",
+                        photoFile
+                    )
+                    takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoUri)
+                    startActivityForResult(takePictureIntent, TAKE_PHOTO_REQUEST)
+                }
+            } else {
+                Toast.makeText(this, "No camera app available", Toast.LENGTH_SHORT).show()
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            Toast.makeText(this, "Error opening camera: ${e.message}", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun createImageFile(): File? {
+        return try {
+            File.createTempFile("photo_", ".jpg", cacheDir)
+        } catch (e: Exception) {
+            e.printStackTrace()
+            null
+        }
+    }
+
+    private fun checkPermissions(): Boolean {
+        val cameraPermission = ContextCompat.checkSelfPermission(this, android.Manifest.permission.CAMERA)
+        return cameraPermission == PackageManager.PERMISSION_GRANTED
+    }
+
+    private fun requestPermissions() {
+        requestPermissions(arrayOf(android.Manifest.permission.CAMERA), 100)
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode == 100 && grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            openCamera()
+        } else {
+            Toast.makeText(this, "Permission required to use camera", Toast.LENGTH_SHORT).show()
+        }
     }
 }
