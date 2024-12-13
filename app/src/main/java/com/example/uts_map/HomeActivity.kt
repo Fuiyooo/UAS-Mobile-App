@@ -33,6 +33,7 @@ class HomeActivity : AppCompatActivity() {
         titleAdapter = TitleAdapter(postList) { post ->
             // Aksi saat judul diklik
             val intent = Intent(this, PostDetailActivity::class.java)
+            intent.putExtra("title", post.title) // Mengirimkan judul postingan
             intent.putExtra("description", post.description)
             intent.putStringArrayListExtra("imageUrls", ArrayList(post.imageUrls))
             startActivity(intent)
