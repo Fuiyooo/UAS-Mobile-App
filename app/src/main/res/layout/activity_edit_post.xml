@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".EditPostActivity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:padding="16dp"
+        android:layout_marginTop="56dp">
+
+        <!-- EditText untuk judul -->
+        <EditText
+            android:id="@+id/etTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Title" />
+
+        <!-- EditText untuk deskripsi -->
+        <EditText
+            android:id="@+id/etDescription"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Description"
+            android:layout_marginTop="8dp" />
+
+        <!-- RecyclerView untuk menampilkan gambar -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rvImages"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp" />
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp">
+
+            <Button
+                android:id="@+id/btnChooseImage"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="16dp"
+                android:text="Choose Image"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/btnTakePhoto"
+                app:layout_constraintHorizontal_chainStyle="spread"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="0.0" />
+
+            <Button
+                android:id="@+id/btnTakePhoto"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="44dp"
+                android:text="Take Photo"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="0.0" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <!-- Tombol untuk menyimpan perubahan -->
+        <Button
+            android:id="@+id/btnSaveChanges"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Save Changes"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="16dp" />
+
+        <!-- Tombol untuk membatalkan perubahan dan kembali ke activity sebelumnya -->
+        <Button
+            android:id="@+id/btnCancelEdit"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Cancel Edit"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="8dp" />
+    </LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

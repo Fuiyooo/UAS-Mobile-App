@@ -17,27 +17,66 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
-    <!-- TextView untuk deskripsi -->
-    <TextView
-        android:id="@+id/tvDescription"
+    <!-- ScrollView untuk membuat halaman dapat di-scroll -->
+    <ScrollView
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:textSize="18sp"
-        android:padding="8dp"
+        android:layout_height="0dp"
+        android:fillViewport="true"
         app:layout_constraintTop_toBottomOf="@id/toolbar"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
-
-    <!-- LinearLayout untuk menampilkan gambar -->
-    <LinearLayout
-        android:id="@+id/llImagesContainer"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:visibility="gone"
-        app:layout_constraintTop_toBottomOf="@id/tvDescription"
-        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="16dp" />
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <!-- Kontainer utama untuk konten -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <!-- TextView untuk deskripsi -->
+            <TextView
+                android:id="@+id/tvDescription"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="18sp"
+                android:padding="8dp" />
+
+            <!-- LinearLayout untuk menampilkan gambar -->
+            <LinearLayout
+                android:id="@+id/llImagesContainer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginTop="16dp"
+                android:visibility="gone" />
+
+            <!-- Tombol Edit dan Delete -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="16dp"
+                android:gravity="end">
+
+                <!-- Tombol Edit -->
+                <Button
+                    android:id="@+id/btnEdit"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Edit"
+                    android:layout_marginEnd="8dp" />
+
+                <!-- Tombol Delete -->
+                <Button
+                    android:id="@+id/btnDelete"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Delete"
+                    android:backgroundTint="@android:color/holo_red_dark"
+                    android:textColor="@android:color/white" />
+            </LinearLayout>
+
+        </LinearLayout>
+    </ScrollView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

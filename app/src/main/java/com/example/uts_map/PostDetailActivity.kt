@@ -1,7 +1,9 @@
 package com.example.uts_map
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.View
+import android.widget.Button
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
@@ -24,11 +26,13 @@ class PostDetailActivity : AppCompatActivity() {
         // Inisialisasi Views
         val tvDescription: TextView = findViewById(R.id.tvDescription)
         val llImagesContainer: LinearLayout = findViewById(R.id.llImagesContainer)
+        val btnEdit: Button = findViewById(R.id.btnEdit) // Inisialisasi tombol Edit
 
         // Mendapatkan data dari Intent
         val description = intent.getStringExtra("description")
         val imageUrls = intent.getStringArrayListExtra("imageUrls") ?: arrayListOf()
         val postTitle = intent.getStringExtra("title") // Mendapatkan judul
+        val postId = intent.getStringExtra("postId") // Mendapatkan postId
 
         // Atur judul Toolbar
         supportActionBar?.title = postTitle
@@ -53,6 +57,16 @@ class PostDetailActivity : AppCompatActivity() {
             }
         } else {
             llImagesContainer.visibility = View.GONE
+        }
+
+        // Tombol Edit
+        btnEdit.setOnClickListener {
+            val intent = Intent(this, EditPostActivity::class.java)
+            intent.putExtra("postId", postId) // Mengirim postId
+            intent.putExtra("title", postTitle) // Mengirim title
+            intent.putExtra("description", description) // Mengirim description
+            intent.putStringArrayListExtra("imageUrls", imageUrls) // Mengirim imageUrls
+            startActivity(intent)
         }
     }
 

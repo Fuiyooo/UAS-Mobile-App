@@ -1,14 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
-
     <!-- Tambahkan permission untuk internet jika menggunakan Firebase atau API online -->
-    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 
-    <!-- Deklarasi aplikasi -->
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -19,24 +17,26 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.UTS_MAP"
         tools:targetApi="31">
-
-        <!-- LoginActivity yang menjadi activity utama (LAUNCHER) -->
+        <activity
+            android:name=".EditPostActivity"
+            android:exported="false" />
+        <activity
+            android:name=".EditPost"
+            android:exported="false" /> <!-- LoginActivity yang menjadi activity utama (LAUNCHER) -->
         <activity
             android:name=".LoginActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-        </activity>
-
-        <!-- Tambahkan Activity lainnya -->
+        </activity> <!-- Tambahkan Activity lainnya -->
         <activity android:name=".SignUpActivity" />
-        <activity android:name=".HomeActivity"/>
-        <activity android:name=".PostActivity"/>
-        <activity android:name=".ProfileActivity"/>
+        <activity android:name=".HomeActivity" />
+        <activity android:name=".PostActivity" />
+        <activity android:name=".ProfileActivity" />
         <activity android:name=".PostDetailActivity" />
-
 
         <provider
             android:name="androidx.core.content.FileProvider"
@@ -47,6 +47,6 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/file_paths" />
         </provider>
-
     </application>
+
 </manifest>

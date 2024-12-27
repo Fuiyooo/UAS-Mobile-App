@@ -1,6 +1,6 @@
 package com.example.uts_map
 
-import ImageAdapter
+import com.example.uts_map.ImageAdapter
 import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
