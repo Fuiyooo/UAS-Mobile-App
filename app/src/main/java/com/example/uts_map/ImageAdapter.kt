@@ -9,9 +9,10 @@ import androidx.recyclerview.widget.RecyclerView
 import com.squareup.picasso.Picasso
 
 class ImageAdapter(
-    private val images: List<Uri>
+    private val images: List<Uri> // Daftar URI gambar
 ) : RecyclerView.Adapter<ImageAdapter.ImageViewHolder>() {
 
+    // ViewHolder untuk item gambar
     class ImageViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val imageView: ImageView = itemView.findViewById(R.id.imageView)
     }
@@ -23,7 +24,15 @@ class ImageAdapter(
 
     override fun onBindViewHolder(holder: ImageViewHolder, position: Int) {
         val uri = images[position]
-        Picasso.get().load(uri).into(holder.imageView)
+
+        // Cek apakah URI adalah URL Firebase atau URI lokal
+        if (uri.toString().startsWith("https://firebasestorage.googleapis.com")) {
+            // URL Firebase, gunakan Picasso untuk memuat gambar
+            Picasso.get().load(uri.toString()).into(holder.imageView)
+        } else {
+            // URI lokal, gunakan ImageView langsung
+            holder.imageView.setImageURI(uri)
+        }
     }
 
     override fun getItemCount(): Int {

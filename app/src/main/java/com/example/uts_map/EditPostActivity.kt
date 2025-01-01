@@ -67,6 +67,14 @@ class EditPostActivity : AppCompatActivity() {
         val title = intent.getStringExtra("title")
         val description = intent.getStringExtra("description")
         val images = intent.getStringArrayListExtra("imageUrls") ?: arrayListOf()
+        // Log untuk memastikan imageUrls diterima dengan benar
+        if (images.isEmpty()) {
+            Toast.makeText(this, "No images received.", Toast.LENGTH_SHORT).show()
+        } else {
+            images.forEach { imageUrl ->
+                println("Received image URL: $imageUrl")
+            }
+        }
 
         // Set data awal
         etTitle.setText(title)
@@ -104,6 +112,32 @@ class EditPostActivity : AppCompatActivity() {
         }
     }
 
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+
+        if (requestCode == PICK_IMAGE_REQUEST && resultCode == Activity.RESULT_OK) {
+            if (data?.clipData != null) {
+                val count = data.clipData!!.itemCount
+                for (i in 0 until count) {
+                    val imageUri = data.clipData!!.getItemAt(i).uri
+                    imageUris.add(imageUri) // Tambahkan ke daftar gambar
+                }
+            } else if (data?.data != null) {
+                val imageUri = data.data!!
+                imageUris.add(imageUri) // Tambahkan ke daftar gambar
+            }
+            imageAdapter.notifyDataSetChanged() // Perbarui RecyclerView
+        } else if (requestCode == TAKE_PHOTO_REQUEST && resultCode == Activity.RESULT_OK) {
+            if (::photoUri.isInitialized) {
+                imageUris.add(photoUri) // Tambahkan gambar dari kamera
+                imageAdapter.notifyDataSetChanged()
+            } else {
+                Toast.makeText(this, "Failed to capture image.", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
+
     // Menyimpan perubahan
     private fun saveChanges() {
         val updatedTitle = etTitle.text.toString().trim()
@@ -120,51 +154,54 @@ class EditPostActivity : AppCompatActivity() {
         }
 
         if (imageUris.isEmpty()) {
+            // Jika tidak ada gambar baru, gunakan gambar lama
             updatePostInFirestore(updatedTitle, updatedDescription, uploadedImageUrls)
             return
         }
 
-        // Upload images
+        // Proses upload gambar baru
         uploadImages(updatedTitle, updatedDescription)
     }
 
     private fun uploadImages(updatedTitle: String, updatedDescription: String) {
         val storageRef = storage.reference
-        val uploadTasks = mutableListOf<Task<Uri>>() // Menyimpan semua task upload
+        val uploadTasks = mutableListOf<Task<Uri>>()
 
-        // Loop untuk setiap URI gambar
         imageUris.forEach { uri ->
-            val imageRef = storageRef.child("posts/${System.currentTimeMillis()}.jpg")
-
-            // Tambahkan setiap task ke daftar
-            val uploadTask = imageRef.putFile(uri)
-                .continueWithTask { task ->
-                    if (!task.isSuccessful) {
-                        task.exception?.let { throw it }
+            // Periksa apakah URI adalah URL download Firebase
+            if (uri.toString().startsWith("https://firebasestorage.googleapis.com")) {
+                // Tambahkan URL langsung ke daftar URL gambar
+                uploadedImageUrls.add(uri.toString())
+            } else {
+                // Jika URI lokal, unggah ke Firebase Storage
+                val imageRef = storageRef.child("posts/${System.currentTimeMillis()}.jpg")
+                val uploadTask = imageRef.putFile(uri)
+                    .continueWithTask { task ->
+                        if (!task.isSuccessful) {
+                            task.exception?.let { throw it }
+                        }
+                        imageRef.downloadUrl
                     }
-                    // Mengambil URL gambar setelah upload berhasil
-                    imageRef.downloadUrl
-                }
-            uploadTasks.add(uploadTask)
+                uploadTasks.add(uploadTask)
+            }
         }
 
-        // Menunggu semua upload selesai
+        // Tunggu semua task upload selesai
         Tasks.whenAllComplete(uploadTasks)
             .addOnSuccessListener { tasks ->
                 val uploadedUrls = tasks.mapNotNull { task ->
                     if (task.isSuccessful) {
                         (task.result as? Uri)?.toString()
                     } else {
-                        null // Jika gagal, abaikan URL ini
+                        null
                     }
                 }
 
-                // Pastikan semua URL sudah terunggah
-                if (uploadedUrls.size == uploadTasks.size) {
-                    updatePostInFirestore(updatedTitle, updatedDescription, uploadedUrls)
-                } else {
-                    Toast.makeText(this, "Some images failed to upload.", Toast.LENGTH_SHORT).show()
-                }
+                // Tambahkan URL yang berhasil di-upload ke daftar
+                uploadedImageUrls.addAll(uploadedUrls)
+
+                // Update post di Firestore
+                updatePostInFirestore(updatedTitle, updatedDescription, uploadedImageUrls)
             }
             .addOnFailureListener { exception ->
                 Toast.makeText(this, "Failed to upload images: ${exception.message}", Toast.LENGTH_SHORT).show()
@@ -194,6 +231,13 @@ class EditPostActivity : AppCompatActivity() {
                 .update(updatedPost)
                 .addOnSuccessListener {
                     Toast.makeText(this, "Post updated successfully", Toast.LENGTH_SHORT).show()
+
+                    // Kirim data yang diperbarui kembali ke PostDetailActivity
+                    val resultIntent = Intent()
+                    resultIntent.putExtra("updatedTitle", title)
+                    resultIntent.putExtra("updatedDescription", description)
+                    resultIntent.putStringArrayListExtra("updatedImageUrls", ArrayList(imageUrls))
+                    setResult(Activity.RESULT_OK, resultIntent)
                     finish()
                 }
                 .addOnFailureListener {
