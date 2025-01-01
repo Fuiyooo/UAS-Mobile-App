@@ -5,6 +5,8 @@ import com.example.uts_map.TitleAdapter
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -18,6 +20,8 @@ class HomeActivity : AppCompatActivity() {
     private lateinit var firestore: FirebaseFirestore
     private var postList = mutableListOf<Post>()
 
+    private lateinit var postDetailLauncher: ActivityResultLauncher<Intent>
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_home)
@@ -26,19 +30,32 @@ class HomeActivity : AppCompatActivity() {
         firestore = FirebaseFirestore.getInstance()
 
         // Inisialisasi RecyclerView
-        rvTitles = findViewById(R.id.rvTitles) // Mengganti id RecyclerView ke rvTitles
+        rvTitles = findViewById(R.id.rvTitles)
         rvTitles.layoutManager = LinearLayoutManager(this)
 
         // Inisialisasi Adapter dengan onItemClick
         titleAdapter = TitleAdapter(postList) { post ->
             // Aksi saat judul diklik
             val intent = Intent(this, PostDetailActivity::class.java)
-            intent.putExtra("title", post.title) // Mengirimkan judul postingan
+            intent.putExtra("postId", post.postId) // Kirimkan postId
+            intent.putExtra("title", post.title)
             intent.putExtra("description", post.description)
             intent.putStringArrayListExtra("imageUrls", ArrayList(post.imageUrls))
-            startActivity(intent)
+            postDetailLauncher.launch(intent) // Gunakan launcher
         }
         rvTitles.adapter = titleAdapter
+
+        // Inisialisasi ActivityResultLauncher untuk menangkap hasil dari PostDetailActivity
+        postDetailLauncher = registerForActivityResult(
+            ActivityResultContracts.StartActivityForResult()
+        ) { result ->
+            if (result.resultCode == RESULT_OK) {
+                val isDeleted = result.data?.getBooleanExtra("postDeleted", false) ?: false
+                if (isDeleted) {
+                    loadTitlesFromFirestore() // Muat ulang data setelah penghapusan
+                }
+            }
+        }
 
         // Ambil data postingan dari Firestore
         loadTitlesFromFirestore()
@@ -77,6 +94,7 @@ class HomeActivity : AppCompatActivity() {
                     for (document in documents) {
                         try {
                             val post = Post(
+                                postId = document.id, // Ambil ID dokumen sebagai postId
                                 title = document.getString("title") ?: "Untitled",
                                 description = document.getString("description") ?: "",
                                 imageUrls = document["imageUrls"] as? List<String> ?: emptyList()

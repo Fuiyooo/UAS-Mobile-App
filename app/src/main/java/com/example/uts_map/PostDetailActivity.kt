@@ -7,8 +7,10 @@ import android.widget.Button
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
+import com.google.firebase.firestore.FirebaseFirestore
 import com.squareup.picasso.Picasso
 
 class PostDetailActivity : AppCompatActivity() {
@@ -26,13 +28,14 @@ class PostDetailActivity : AppCompatActivity() {
         // Inisialisasi Views
         val tvDescription: TextView = findViewById(R.id.tvDescription)
         val llImagesContainer: LinearLayout = findViewById(R.id.llImagesContainer)
-        val btnEdit: Button = findViewById(R.id.btnEdit) // Inisialisasi tombol Edit
+        val btnEdit: Button = findViewById(R.id.btnEdit)
+        val btnDelete: Button = findViewById(R.id.btnDelete) // Inisialisasi tombol Delete
 
         // Mendapatkan data dari Intent
         val description = intent.getStringExtra("description")
         val imageUrls = intent.getStringArrayListExtra("imageUrls") ?: arrayListOf()
-        val postTitle = intent.getStringExtra("title") // Mendapatkan judul
-        val postId = intent.getStringExtra("postId") // Mendapatkan postId
+        val postTitle = intent.getStringExtra("title")
+        val postId = intent.getStringExtra("postId")
 
         // Atur judul Toolbar
         supportActionBar?.title = postTitle
@@ -62,12 +65,37 @@ class PostDetailActivity : AppCompatActivity() {
         // Tombol Edit
         btnEdit.setOnClickListener {
             val intent = Intent(this, EditPostActivity::class.java)
-            intent.putExtra("postId", postId) // Mengirim postId
-            intent.putExtra("title", postTitle) // Mengirim title
-            intent.putExtra("description", description) // Mengirim description
-            intent.putStringArrayListExtra("imageUrls", imageUrls) // Mengirim imageUrls
+            intent.putExtra("postId", postId)
+            intent.putExtra("title", postTitle)
+            intent.putExtra("description", description)
+            intent.putStringArrayListExtra("imageUrls", imageUrls)
             startActivity(intent)
         }
+
+        // Tombol Delete
+        btnDelete.setOnClickListener {
+            if (postId != null) {
+                deletePost(postId)
+            } else {
+                Toast.makeText(this, "Post ID not found", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
+    private fun deletePost(postId: String) {
+        val firestore = FirebaseFirestore.getInstance()
+        firestore.collection("posts").document(postId)
+            .delete()
+            .addOnSuccessListener {
+                Toast.makeText(this, "Post deleted successfully", Toast.LENGTH_SHORT).show()
+                val resultIntent = Intent()
+                resultIntent.putExtra("postDeleted", true) // Kirim informasi bahwa post dihapus
+                setResult(RESULT_OK, resultIntent) // Beri tanda bahwa operasi berhasil
+                finish() // Kembali ke HomeActivity
+            }
+            .addOnFailureListener { e ->
+                Toast.makeText(this, "Failed to delete post: ${e.message}", Toast.LENGTH_SHORT).show()
+            }
     }
 
     // Fungsi untuk menangani tombol back

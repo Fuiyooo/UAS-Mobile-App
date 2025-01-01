@@ -54,6 +54,7 @@ dependencies {
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
 
+
     // Firebase dependencies
 
 
@@ -66,6 +67,7 @@ dependencies {
     implementation("com.squareup.picasso:picasso:2.71828")
     implementation ("androidx.recyclerview:recyclerview:1.3.1")
     implementation ("com.google.android.gms:play-services-tasks:18.0.2")
+    implementation ("androidx.activity:activity-ktx:1.7.2")
 
 //    implementation("com.github.bumptech.glide:glide:4.15.1")
 //    kapt("com.github.bumptech.glide:compiler:4.15.1")
