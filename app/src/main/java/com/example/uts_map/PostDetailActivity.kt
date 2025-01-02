@@ -82,20 +82,26 @@ class PostDetailActivity : AppCompatActivity() {
 
                 // Perbarui gambar di LinearLayout
                 llImagesContainer.removeAllViews()
-                updatedImageUrls?.forEach { url ->
-                    val imageView = ImageView(this)
-                    imageView.layoutParams = LinearLayout.LayoutParams(
-                        LinearLayout.LayoutParams.MATCH_PARENT,
-                        LinearLayout.LayoutParams.WRAP_CONTENT
-                    ).apply {
-                        setMargins(0, 16, 0, 16)
+                if (updatedImageUrls.isNullOrEmpty()) {
+                    llImagesContainer.visibility = View.GONE
+                } else {
+                    llImagesContainer.visibility = View.VISIBLE // Tampilkan LinearLayout
+                    updatedImageUrls.forEach { url ->
+                        val imageView = ImageView(this)
+                        imageView.layoutParams = LinearLayout.LayoutParams(
+                            LinearLayout.LayoutParams.MATCH_PARENT,
+                            LinearLayout.LayoutParams.WRAP_CONTENT
+                        ).apply {
+                            setMargins(0, 16, 0, 16)
+                        }
+                        imageView.scaleType = ImageView.ScaleType.CENTER_CROP
+                        Picasso.get().load(url).into(imageView)
+                        llImagesContainer.addView(imageView)
                     }
-                    imageView.scaleType = ImageView.ScaleType.CENTER_CROP
-                    Picasso.get().load(url).into(imageView)
-                    llImagesContainer.addView(imageView)
                 }
             }
         }
+
 
         // Tombol Edit
         btnEdit.setOnClickListener {

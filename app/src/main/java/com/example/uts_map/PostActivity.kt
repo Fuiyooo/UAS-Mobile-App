@@ -1,6 +1,5 @@
 package com.example.uts_map
 
-import com.example.uts_map.ImageAdapter
 import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -59,6 +58,7 @@ class PostActivity : AppCompatActivity() {
         imageAdapter = ImageAdapter(imageUris)
         rvImages.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
         rvImages.adapter = imageAdapter
+        updateRecyclerViewVisibility()
 
         // Tombol untuk memilih gambar
         btnChooseImage.setOnClickListener {
@@ -115,9 +115,11 @@ class PostActivity : AppCompatActivity() {
             } else if (data?.data != null) {
                 imageUris.add(data.data!!)
             }
+            updateRecyclerViewVisibility()
             imageAdapter.notifyDataSetChanged()
         } else if (requestCode == TAKE_PHOTO_REQUEST && resultCode == Activity.RESULT_OK) {
             imageUris.add(photoUri)
+            updateRecyclerViewVisibility()
             imageAdapter.notifyDataSetChanged()
         }
     }
@@ -169,6 +171,14 @@ class PostActivity : AppCompatActivity() {
             .addOnFailureListener {
                 Toast.makeText(this, "Failed to upload post: ${it.message}", Toast.LENGTH_SHORT).show()
             }
+    }
+
+    private fun updateRecyclerViewVisibility() {
+        rvImages.visibility = if (imageUris.isNullOrEmpty()) {
+            RecyclerView.GONE
+        } else {
+            RecyclerView.VISIBLE
+        }
     }
 
     private fun openCamera() {
