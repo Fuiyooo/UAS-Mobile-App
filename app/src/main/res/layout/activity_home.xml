@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/background_color"
+    android:background="@android:color/white"
     tools:context=".HomeActivity">
 
     <!-- Kontainer utama -->
@@ -17,10 +17,10 @@
             android:id="@+id/topAppBar"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:background="@color/primary_color"
+            android:background="@android:color/white"
             android:elevation="4dp"
-            android:title="UMN Story"
-            android:titleTextColor="@color/primary_color"
+            android:title="UMN Dairy"
+            android:titleTextColor="@android:color/black"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />
@@ -44,11 +44,11 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom"
-            android:background="@color/primary_light"
+            android:background="@android:color/white"
             app:menu="@menu/bottom_nav_menu"
             app:labelVisibilityMode="labeled"
-            app:itemIconTint="@color/nav_item_color"
-            app:itemTextColor="@color/nav_item_color"
+            app:itemIconTint="@android:color/black"
+            app:itemTextColor="@android:color/black"
             app:layout_constraintBottom_toBottomOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>

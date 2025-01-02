@@ -57,7 +57,7 @@ dependencies {
 
     // Firebase dependencies
 
-
+    implementation ("com.google.android.gms:play-services-base:18.1.0")
     implementation(platform("com.google.firebase:firebase-bom:32.0.0"))
     implementation("com.google.firebase:firebase-auth")
     implementation("com.google.firebase:firebase-firestore")
